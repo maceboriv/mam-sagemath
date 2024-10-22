@@ -186,7 +186,8 @@ def jacobi_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     J, C = jacobi_matriz(A)
     err = tol + 1
     u = copy(x0)
-    
+    k = 0
+
     while err > tol and k < kmax:
         v = J*u + C*b
         u = v
@@ -296,6 +297,7 @@ def gauss_seidel_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     L1, C = gauss_seidel_matriz(A)
     err = tol + 1
     u = copy(x0)
+    k = 0
     
     while err > tol and k < kmax:
         v = L1*u + C*b
@@ -340,7 +342,8 @@ def sor_matricial(A, b, x0, w, tol=10^-3, kmax=20, v=True):
     Lw, C = sor_matriz(A, w)
     err = tol + 1
     u = copy(x0)
-    
+    k = 0
+
     while err > tol and k < kmax:
         v = Lw*u + C*b
         u = v
