@@ -40,7 +40,7 @@ def jacobi_matriz(A):
     J = C*(E+F)
     return J, C
 
-def gauss_seidel_matriz(A)
+def gauss_seidel_matriz(A):
     """Calcula L1 y C para el método de Gauss-Seidel, siendo A la matriz del sistema. Devuelve así una tupla de dos matrices.
     
     Ejemplo:
