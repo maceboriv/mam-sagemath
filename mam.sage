@@ -22,7 +22,7 @@ def separar_matriz(A):
     if not A.is_square():
         raise ValueError("La matriz no es cuadrada")
     n = A.dimensions()[0]
-    D = diagonal_matrix(QQ, [A[i,i] for i in n])
+    D = diagonal_matrix(QQ, [A[i,i] for i in range(n)])
     E = matrix(QQ, [[0 if i<=j else -A[i,j] for j in range(n)] for i in range(n)])
     F = matrix(QQ, [[0 if i>=j else -A[i,j] for j in range(n)] for i in range(n)])
     return D,E,F
