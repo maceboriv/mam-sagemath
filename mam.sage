@@ -86,7 +86,7 @@ def sor_wopt(A):
         for j in range(n):
             if (j < i - 1 or j > i + 1) and A[i, j] != 0:
                 raise ValueError("La matriz no es tridiagonal")
-    J = jacobi_matriz(A)
+    J = jacobi_matriz(A)[0]
     k = radio_espectral(J)
     return 2/(1+sqrt(1-k^2))
 
