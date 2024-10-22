@@ -182,8 +182,7 @@ def jacobi_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     """
     if not A.is_square():
         raise ValueError("La matriz no es cuadrada")
-        
-    A = matriz.dimensions()[0]
+    
     J, C = jacobi_matriz(A)
     err = tol + 1
     u = x0.copy()
@@ -293,8 +292,7 @@ def gauss_seidel_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     """
     if not A.is_square():
         raise ValueError("La matriz no es cuadrada")
-        
-    A = matriz.dimensions()[0]
+    
     L1, C = gauss_seidel_matriz(A)
     err = tol + 1
     u = x0.copy()
@@ -339,7 +337,6 @@ def sor_matricial(A, b, x0, w, tol=10^-3, kmax=20, v=True):
     if not A.is_square():
         raise ValueError("La matriz no es cuadrada")
     
-    A = matriz.dimensions()[0]
     Lw, C = sor_matriz(A, w)
     err = tol + 1
     u = x0.copy()
