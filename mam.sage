@@ -13,7 +13,7 @@ def converge(A) -> bool:
 
     Es equivalente decir que:
         1. p(A) < 1
-        2. existe al mens una norma matricial tal que ||A|| < 1
+        2. existe al menos una norma matricial tal que ||A|| < 1
     """
     return radio_espectral(A) < 1
 
@@ -131,13 +131,13 @@ def jacobi_punto(A, b, x0, tol=10^-3, kmax=20, pausa=0, v=True):
     time.sleep(pausa)
     if v: print("Comenzamos el método de Jacobi")
 
-    x = x0.copy()
+    x = copy(x0)
     error = tol + 1
     k = 0
 
     while error > tol and k < kmax:
         error = 0
-        y = x.copy()
+        y = copy(x)
 
         for i in range(n):
             x[i] = b[i]
@@ -185,7 +185,7 @@ def jacobi_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     
     J, C = jacobi_matriz(A)
     err = tol + 1
-    u = x0.copy()
+    u = copy(x0)
     
     while err > tol and k < kmax:
         v = J*u + C*b
@@ -241,7 +241,7 @@ def gauss_seidel_punto(A, b, x0, tol=10^-3, kmax=20, pausa=0, v=True):
     time.sleep(pausa)
     if v: print("Comenzamos el método de Gauss-Seidel")
 
-    x = x0.copy()
+    x = copy(x0)
     error = tol + 1
     k = 0
 
@@ -295,7 +295,7 @@ def gauss_seidel_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     
     L1, C = gauss_seidel_matriz(A)
     err = tol + 1
-    u = x0.copy()
+    u = copy(x0)
     
     while err > tol and k < kmax:
         v = L1*u + C*b
@@ -339,7 +339,7 @@ def sor_matricial(A, b, x0, w, tol=10^-3, kmax=20, v=True):
     
     Lw, C = sor_matriz(A, w)
     err = tol + 1
-    u = x0.copy()
+    u = copy(x0)
     
     while err > tol and k < kmax:
         v = Lw*u + C*b
