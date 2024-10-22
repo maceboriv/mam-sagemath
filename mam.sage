@@ -192,6 +192,7 @@ def jacobi_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
         v = J*u + C*b
         u = v
         err = (A*v-b).norm()
+        k += 1
         if v: print("Resultado de la iteración", k, "del método de Jacobi:")
         if v: print("X =", v)
         if v: print("Error =", err)
@@ -303,6 +304,8 @@ def gauss_seidel_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
         v = L1*u + C*b
         u = v
         err = (A*v-b).norm()
+        k += 1
+        
         if v: print("Resultado de la iteración", k, "del método de Gauss-Seidel:")
         if v: print("X =", v)
         if v: print("Error =", err)
@@ -348,6 +351,8 @@ def sor_matricial(A, b, x0, w, tol=10^-3, kmax=20, v=True):
         v = Lw*u + C*b
         u = v
         err = (A*v-b).norm()
+        k += 1
+        
         if v: print("Resultado de la iteración", k, "del método de sobrerrelajación:")
         if v: print("X =", v)
         if v: print("Error =", err)
