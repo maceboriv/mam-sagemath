@@ -151,14 +151,14 @@ def jacobi_punto(A, b, x0, tol=10^-3, kmax=20, pausa=0, v=True):
         
         k += 1
         if v: print("Resultado de la iteración", k, "del método de Jacobi:")
-        if v: print("X =", x)
-        if v: print("Error =", error)
+        if v: print("X =", N(x))
+        if v: print("Error =", N(error))
         time.sleep(pausa)
 
     if k >= kmax:
         print("Número máximo de iteraciones superado")
     
-    return x, error
+    return N(x), N(error)
 
 def jacobi_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     """Implementación del método de Jacobi de forma matricial (menos eficiente que el punto a punto)
@@ -194,13 +194,13 @@ def jacobi_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
         err = (A*v-b).norm()
         k += 1
         if v: print("Resultado de la iteración", k, "del método de Jacobi:")
-        if v: print("X =", v)
-        if v: print("Error =", err)
+        if v: print("X =", N(v))
+        if v: print("Error =", N(err))
     
     if k >= kmax:
         print("Número máximo de iteraciones superado")
         
-    return v,err
+    return N(v),N(err)
 
 def gauss_seidel_punto(A, b, x0, tol=10^-3, kmax=20, pausa=0, v=True):
     """Implementación del método de Gauss-Seidel punto a punto (superior al matricial)
@@ -263,14 +263,14 @@ def gauss_seidel_punto(A, b, x0, tol=10^-3, kmax=20, pausa=0, v=True):
         k += 1
         
         if v: print("Resultado de la iteración", k, "del método de Gauss-Seidel:")
-        if v: print("X =", x)
-        if v: print("Error =", error)
+        if v: print("X =", N(x))
+        if v: print("Error =", N(error))
         time.sleep(pausa)
 
     if k >= kmax:
         print("Número máximo de iteraciones superado")
         
-    return x, error
+    return N(x), N(error)
 
 def gauss_seidel_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
     """Implementación del método de Gauss-Seidel de forma matricial (menos eficiente que el punto a punto)
@@ -307,13 +307,13 @@ def gauss_seidel_matricial(A, b, x0, tol=10^-3, kmax=20, v=True):
         k += 1
         
         if v: print("Resultado de la iteración", k, "del método de Gauss-Seidel:")
-        if v: print("X =", v)
-        if v: print("Error =", err)
+        if v: print("X =", N(v))
+        if v: print("Error =", N(err))
     
     if k >= kmax:
         print("Número máximo de iteraciones superado")
         
-    return v,err
+    return N(v),N(err)
 
 def sor_matricial(A, b, x0, w, tol=10^-3, kmax=20, v=True):
     """Implementación del método de Sobrerrelajación Sucesiva de forma matricial
@@ -354,13 +354,13 @@ def sor_matricial(A, b, x0, w, tol=10^-3, kmax=20, v=True):
         k += 1
         
         if v: print("Resultado de la iteración", k, "del método de sobrerrelajación:")
-        if v: print("X =", v)
-        if v: print("Error =", err)
+        if v: print("X =", N(v))
+        if v: print("Error =", N(err))
     
     if k >= kmax:
         print("Número máximo de iteraciones superado")
         
-    return v,err
+    return N(v),N(err)
 
 def iteraciones_tol(metodo, b, x0, tol, norma=Infinity):
     """Dada una tupla de dos matrices M,C asociadas a un método iterativo, el término independiente del sistema, una aproximación inicial y una norma matricial, devuelve el número mínimo de iteraciones para que converja."""
