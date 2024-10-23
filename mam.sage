@@ -2,11 +2,11 @@ import time
 
 def espectro(A):
     """Devuelve el espectro de la matriz A en forma de lista"""
-    return [abs(x) for x in A.eigenvalues()]
+    return A.eigenvalues()
 
 def radio_espectral(A):
     """Devuelve el radio espectral de la matriz A, es decir, el mayor VAP en valor absoluto"""
-    return max(espectro(A))
+    return max(map(abs, espectro(A)))
 
 def converge(A) -> bool:
     """Dada una matriz A (asociada a un método) devuelve `True` si el método converge o False en caso contrario
@@ -407,3 +407,160 @@ def lu_cholesky(A):
     U = M
     L = N
     return P,L,U
+
+def condicionamiento_matriz(A, norma=Infinity):
+    """Devuelve el número de condición de la matriz A asociada a un sistema lineal en la norma dada
+    """
+    return A.norm(norma)*A.inverse().norm(norma)
+
+# ==================================================================================================================
+
+def punto_fijo(f, x0, niter=20):
+    """Aplica niter iteraciones del método del punto fijo a f partiendo de x0
+    Recordar que para usar este método es necesario:
+        1) f continua en [a,b]
+        2) f([a,b]) c [a,b]
+    
+    1), 2) => Requisitos para que exista al menos un punto fijo (Teorema de Brouwer)
+        
+        3) f contractiva ó |f'(x)| < 1 en (a,b)
+     1),2),3) => Existe un ÚNICO punto fijo (Teorema de Banach)
+
+    Teorema de Schröder: si x* es punto fijo de g y las derivadas n-ésimas evaluadas en x* se anulan hasta la p (siendo esta no nula)
+    entonces el método de punto fijo converge como mínimo con orden p.
+
+    Ejemplo:
+
+    |    f(x) = 2*x*(1-x)
+    |    punto_fijo(f, 3/4, 15)
+    """
+    resultados = [x0]
+
+    for i in range(niter):
+        x0 = f(x0)
+        resultados.append(N(x0))
+
+    return resultados
+
+
+def biseccion(f, intervalo, tol=10^-3, kmax=10):
+    """Aproxima la raíz de f en intervalo con una tolerancia al error tol y kmax iteraciones máximas
+    
+    Condiciones:
+        1) f continua en [a,b]
+        2) f(a)f(b)<0
+
+    Cota de error: abs(solucion - c_n) <= 1/(2^(n+1)) * abs(b_0 - a_0)
+
+    Ejemplo:
+
+    |    f(x) = x*sin(x)-1
+    |    intervalo = (0, 2)
+    |    r, err = biseccion(f, intervalo, 10^-2, 20)
+    """
+    a, b = intervalo
+    a0 = a
+    b0 = b
+    k = 0
+    
+    if f(a)*f(b)>=0:
+        raise ValueError("f(a)f(b) >= 0") # Comprobamos 2
+
+    while abs(b - a) > tol and k < kmax:
+        c = (a + b) / 2             # Sucesión {Cn} de las aproximaciones sucesivas
+
+        if f(a) * f(c) < 0:         # raíz € [a,c]
+            b = c
+        else:                       # raíz € [c,b]
+            a = c
+        k += 1
+
+    if k >= kmax:
+        print("Número máximo de iteraciones superado")
+
+    raiz = (a + b) / 2
+    err = (1/2^(k+1))*abs(b0-a0)    # Cota para el error
+    return N(raiz), N(err)
+
+def regula_falsi(f, intervalo, tol=10^-3, kmax=10):
+    """Aproxima la raíz de f en intervalo con una tolerancia al error tol y kmax iteraciones máximas
+    
+    Condiciones:
+        1) f continua en [a,b]
+        2) f(a)f(b)<0
+
+    Cota de error: abs(solucion - c_n) <= 1/(2^(n+1)) * abs(b_0 - a_0)
+
+    Ejemplo:
+
+    |    f(x) = x*sin(x)-1
+    |    intervalo = (0, 2)
+    |    r, err = biseccion(f, intervalo, 10^-2, 20)
+    """
+    
+    a, b = intervalo
+    a0 = a
+    b0 = b
+    k = 0
+    
+    if f(a)*f(b)>=0:
+        raise ValueError("f(a)f(b) >= 0") # Comprobamos 2
+
+    while abs(b - a) > tol and k < kmax:
+        c = (a*f(b) - b*f(a)) / (f(b)-f(a))      # Sucesión {Cn} de las aproximaciones sucesivas
+
+        if f(a) * f(c) < 0:                      # raíz € [a,c]
+            b = c
+        else:                                    # raíz € [c,b]
+            a = c
+        k += 1
+
+    if k >= kmax:
+        print("Número máximo de iteraciones superado")
+
+    raiz = (a*f(b) - b*f(a)) / (f(b)-f(a))    
+    err = (1/2^(iteracion+1))*abs(b0-a0)         # Cota para el error
+    return N(raiz), N(err)
+
+def newton_raphson(f, x0, tol=10^-3, kmax=20):
+    """Dada f que cumple las condiciones de convergencia adecuadas, aproxima la raíz en un intervalo (a,b) mediante el método de Newton-Raphson
+    
+    Condiciones:
+        -Convergencia local:
+         Existe d tq si (x ± d) ⊆ [a,b] entonces el método converge a x* para todo x ∈ (x ± d)
+
+        -Convergencia global (condiciones de Fourier):
+         1) f(a)f(b) < 0
+         2) f'(x) != 0 si x∈[a,b]
+         3) f''(x) no cambia de signo en [a,b]
+         4) máx {|f(a)/f'(a)|, |f(b)/f'(b)|} <= b-a
+         Entonces el método converge para cualquier x0 ∈ [a,b]
+
+        -Convergencia semilocal:
+          Dado un x0 ∈ [a,b]
+          * 1) 2) 3) de las condiciones de Fourier
+          * 4) f(x0)f''(x0) >=0
+          Entonces el método converge sólo desde ese x0
+
+    El método converge como mínimo con orden cuadrático si la raíz es SIMPLE. Lineal en caso contrario.
+
+    Ejemplo:
+
+    |    f(x)= x^3 - 3*x +2
+    |    x0 = -2.4
+    |    xn, err = newton_raphson(f, x0, 10^-1, 10)
+    """
+    
+    x_n = x0
+    dx = f.diff(x)
+
+    for i in range(kmax):
+        x_n1 = x_n - (f(x_n) / dx(x_n))                 #Función de Newton
+
+        if abs(x_n1 - x_n) < tol:                 
+            return x_n1
+
+        x_n = x_n1
+
+    print("Número máximo de iteraciones superado")
+    return x_n
