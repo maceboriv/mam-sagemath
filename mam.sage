@@ -685,3 +685,63 @@ def bairstow(p, z, tol=10^-3, kmax=10, valor=False, v=True):
     a=N(z[0]/2)
     b=N(sqrt(-(4*z[1] + z[0]^2))/2)
     return [a + b*I, a - b*I]
+
+def graeffe(p, tol=10^-3, kmax=20, v=True):
+    """
+    Aplica el método de Gräffe para encontrar las raíces de un polinomio p.
+    
+    Parámetros:
+    - p es el polinomio al que vamos a aplicar el método
+    - tol es la tolerancia del error, el método termina si el error es más pequeño que tol
+    - kmax es el número máximo de iteraciones que realiza el método antes de parar
+    - v es un parámetro que controla los mensajes. Si se pone en True, imprimirá cada paso del método
+    
+    Ejemplo:
+
+    |    p(x) = x^3 - 6*x^2 + 11*x - 6
+    |    graeffe(p, kmax=4)
+    """
+    
+    coef = p.coefficients(sparse=False)
+    n = len(coef) - 1
+    if n  == 0:
+        raise ValueError("El polinomio es de grado 0")
+    
+    raices = [0]*n
+    k = 0
+    
+    while k <= kmax:
+        coef1 = [0]*(2*n+1)
+        # Calculamos los nuevos coeficientes
+        for i in range(n+1):
+            for j in range(n+1):
+                if i + j < len(coef1):                    
+                    if j % 2 != 0: b = -coef[j]
+                    else: b = coef[j]
+                    
+                    coef1[i + j] += coef[i]*b
+        
+        map(lambda x: (-1)^n * x, coef1)
+        
+        for i in range(n):
+            raices[i] = N((-coef[i] / coef[i+1])^(1/(2^k)))
+            
+        if v:
+            print(f"\nIteración {k}")
+            print(coef)
+            print(raices)
+            
+        if abs(p.subs(x=raices[0])) < tol:
+            break
+        
+        coef = list(filter(lambda x: x != 0, coef1))
+        
+        norm = max(abs(c) for c in coef)
+        map(lambda x: x/norm, coef)
+        
+        k += 1
+
+    if k > kmax:
+        print("Número máximo de iteraciones superado")
+        
+    return raices
