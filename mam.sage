@@ -564,3 +564,124 @@ def newton_raphson(f, x0, tol=10^-3, kmax=20):
 
     print("Número máximo de iteraciones superado")
     return x_n
+
+# ==================================================================================================================
+def cotas_mclaurin(p, valor=False):
+    """Dado p un polinomio, devuelve las cotas i, s tales que si x es raíz del polinomio, i < |x| < s
+    Si se pasa valor=True como argumento, devuelve solo el valor de las cotas de McLaurin.
+
+    Ejemplo:
+
+    |    p(x) = x^4 - 4*x^3 -x^2 + 3*x -5
+    |    i, s = cotas_mclaurin(p)
+    """
+
+    coefs = p.coefficients(sparse=False)
+    s = max([abs(coefs[i]/coefs[-1]) for i in range(len(coefs) -1)]) # Cota minimal (inferior)
+    i = max([abs(coefs[i]/coefs[0]) for i in range(1, len(coefs))]) # Cota maximal (superior)
+
+    if not valor:
+        i = 1/(1+i)
+        s += 1
+
+    return i, s
+
+def division_polinomios(D, d):
+    """Devuelve c y r polinomios tales que D = c*d + r
+    
+    Ejemplo:
+
+    |    D(x) = x^4 - 4*x + 1
+    |    d(x) = 4*x^3 - 4
+    |    division_polinomios(D, d)
+    """
+    return D.maxima_methods().divide(d)
+
+def cadena_sturm(p):
+    """Computa la cadena de Sturm del polinomio p
+    
+    Ejemplo:
+
+    |    p(x) = x^4 - 4*x + 1
+    |    cadena_sturm(p)
+    """
+
+    cadena = [p, p.diff(x)]
+
+    while cadena[-1] != 0:
+        cadena.append(-division_polinomios(cadena[-2], cadena[-1])[1])
+
+    return cadena[:-1] # Quitamos el 0 final
+
+def bairstow(p, z, tol=10^-3, kmax=10, valor=False, v=True):
+    """ Utiliza el método de Bairstow para encontrar un polinomio cuadrático x^2 - ux - v
+    con 2 raíces complejas factor de p.
+    
+    Parámetros:
+    - p es un polinomio de una variable con coeficientes en R y raíces complejas
+    - z es la aproximación inicial de (u, v)
+    - tol es la tolerancia del error, el método termina si el error es más pequeño que tol
+    - kmax es el número máximo de iteraciones que realiza el método antes de parar
+    - v es un parámetro que controla los mensajes. Si se pone en True, imprimirá cada paso del método
+    - valor es un parámetro que controla lo que devuelve la función. Si se pone en True, devolverá el
+        valor de u y v; en caso contrario se devolverán las raíces aproximadas
+
+    Ejemplo:
+    
+    |    p(x) = x^3 + x - 3
+    |    bairstow(p, vector([1,1]), kmax=12, v=False)
+    """
+    
+    coefs = p.coefficients(sparse=False)
+    if not all(c in RR for c in coefs):
+        raise ValueError("El polinomio tiene coeficientes complejos")
+    
+    n = len(coefs) - 1
+    b = [0]*(n + 1)
+    c = [0]*(n + 1)
+    
+    if v: print("Valor inicial:")
+    if v: print(z)
+
+    k = 0
+    while k < kmax:
+        b[n] = coefs[n]
+        b[n - 1] = coefs[n - 1] + z[0] * b[n]
+        for j in (2..n):
+            b[n - j] = coefs[n - j] + z[0] * b[n - j + 1] + z[1] * b[n - j + 2]
+        
+        c[n] = 0
+        c[n - 1] = b[n]
+        for j in (2..n):
+            c[n - j] = b[n - j + 1] + z[0] * c[n - j + 1] + z[1] * c[n - j + 2]
+        
+        denom = (c[0] * c[2] - c[1] * c[1])
+        
+        if abs(denom) < tol:
+            print("Denominador cercano a cero")
+            break
+        
+        delta_u = (c[1] * b[1] - c[2] * b[0]) / denom
+        delta_v = (c[1] * b[0] - c[0] * b[1]) / denom
+        
+        delta = vector([delta_u, delta_v])
+        z += delta
+        
+        # El error es menor que la tolerancia, paramos
+        if abs(delta_u) < tol and abs(delta_v) < tol:
+            break
+        
+        if v: print(f"\nIteración número {k + 1}:")
+        if v: print(N(z))
+        
+        k += 1
+        
+    if k >= kmax:
+        print("Número máximo de iteraciones superado")
+        
+    if valor:
+        return z.list()
+    
+    a=N(z[0]/2)
+    b=N(sqrt(-(4*z[1] + z[0]^2))/2)
+    return [a + b*I, a - b*I]
