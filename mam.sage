@@ -566,6 +566,7 @@ def newton_raphson(f, x0, tol=10^-3, kmax=20):
     return x_n
 
 # ==================================================================================================================
+
 def cotas_mclaurin(p, valor=False):
     """Dado p un polinomio, devuelve las cotas i, s tales que si x es raíz del polinomio, i < |x| < s
     Si se pasa valor=True como argumento, devuelve solo el valor de las cotas de McLaurin.
@@ -745,3 +746,69 @@ def graeffe(p, tol=10^-3, kmax=20, v=True):
         print("Número máximo de iteraciones superado")
         
     return raices
+
+# ==================================================================================================================
+
+def potencia(A, z, d=0, inversa=False, norma=Infinity, niter=10, v=True):
+    """ Utiliza el método de la potencia para calcular el valor propio dominante y su vector propio asociado.
+    
+    Parámetros:
+    - A es la matriz a la que queremos aplicar el método
+    - z es la aproximación inicial
+    - d es el desplazamiento
+    - inversa indica si invertir la matriz
+    - norma es la norma que vamos a utilizar en el método
+    - niter es el número de iteraciones
+    - v es un parámetro que controla los mensajes. Si se pone en True, imprimirá cada paso del método
+    
+    Ejemplo:
+
+    |    A=(matrix(QQ, 2, 2, [1, 2, 5, 4])
+    |    z=vector(QQ, [1,1])
+    |    MetPotencias(A, z, niter=16)
+    """
+
+    if not A.is_square():
+        raise ValueError("Se necesita una matriz cuadrada")
+
+    n = A.dimensions()[0]
+    if len(z.list()) != n:
+        raise ValueError("Las dimensiones de A y z no concuerdan")
+        
+    if niter <= 0:
+        raise ValueError("El número de iteraciones debe ser positivo")
+    
+    anterior = z
+    A = A - d*identity_matrix(n)
+    
+    if inversa:
+        A = ~A
+    
+    for i in (1..niter):
+        anterior  = z
+        y=A*z
+
+        z=y/y.norm(norma)
+
+        if v:
+            print("\nIteración " + str(i))
+            show(LatexExpr(f"y_{i} = "), N(y))
+            show(LatexExpr(f"z_{i} = "), N(z))
+    
+    if v:
+        print("\nCalculamos ahora los q's:")
+
+        for j in range(n):
+            q=y[j]/anterior[j]
+            if inversa:
+                q = 1/q
+            q += d
+            show(LatexExpr(f"q_{j+1} = "), q, LatexExpr(r" \approx "), N(q))
+    
+    l = (z*A*z) / (z*z)
+    if inversa:
+        l = 1/l
+    l += d
+    if v:
+        show(LatexExpr(r"\lambda_1 = "), l, LatexExpr(r" \approx "), N(l))
+    return l
